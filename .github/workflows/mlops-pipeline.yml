@@ -46,7 +46,7 @@ jobs:
           python -m src.data_loader
           # Train a dummy model for testing the API
           python -m src.train
-          pytest tests/
+          python -m pytest tests/
 
   model-training:
     needs: unit-tests

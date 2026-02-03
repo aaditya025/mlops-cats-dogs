@@ -44,6 +44,8 @@ jobs:
         run: |
           # Generate mock data
           python -m src.data_loader
+          # Train a dummy model for testing the API
+          python -m src.train
           pytest tests/
 
   model-training:

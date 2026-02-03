@@ -25,9 +25,11 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run Unit Tests
+      env:
+        PYTHONPATH: .
       run: |
         # Generate mock data if needed for tests
-        python src/data_loader.py
+        python -m src.data_loader
         pytest tests/
 
     - name: Build Docker Image

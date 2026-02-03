@@ -5,8 +5,13 @@ import numpy as np
 from PIL import Image
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from contextlib import asynccontextmanager
+import time
+from starlette.middleware.base import BaseHTTPMiddleware
+import logging
 
-app = FastAPI(title="Cats vs Dogs Inference Service")
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Global model variable
 model = None
@@ -24,7 +29,28 @@ async def lifespan(app: FastAPI):
     yield
     # Clean up (if needed)
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="Cats vs Dogs Inference Service", lifespan=lifespan)
+
+# Add CORS Middleware
+from fastapi.middleware.cors import CORSMiddleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class LoggingMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        logger.info(f"Request: {request.method} {request.url.path} - Status: {response.status_code} - Duration: {process_time:.4f}s")
+        return response
+
+# Add Logging Middleware
+app.add_middleware(LoggingMiddleware)
 
 @app.get("/health")
 def health_check():

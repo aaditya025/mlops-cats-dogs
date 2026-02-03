@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  inference-service:
+    build: .
+    image: mlops-cats-dogs:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+    restart: always

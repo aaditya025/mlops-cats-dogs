@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cats vs Dogs Classifier</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐾 Pet Classifier</h1>
+            <p>Upload an image to detect if it's a Cat or a Dog!</p>
+        </header>
+
+        <main>
+            <div class="upload-section" id="drop-zone">
+                <input type="file" id="file-input" accept="image/*" hidden>
+                <div class="upload-content">
+                    <div class="icon-placeholder">📷</div>
+                    <p>Drag & Drop or <span class="browse-link">Browse</span></p>
+                </div>
+                <img id="preview-image" hidden alt="Image Preview">
+            </div>
+
+            <button id="predict-btn" disabled>Analyze Image</button>
+
+            <div class="result-section" id="result-section" hidden>
+                <div class="result-card">
+                    <div class="result-icon" id="result-icon">?</div>
+                    <h2 id="result-label">Result</h2>
+                    <div class="confidence-bar-container">
+                        <div class="confidence-bar" id="confidence-bar"></div>
+                    </div>
+                    <p id="result-confidence">Confidence: 0%</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

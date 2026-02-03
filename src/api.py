@@ -1,0 +1,71 @@
+import io
+import os
+import tensorflow as tf
+import numpy as np
+from PIL import Image
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from contextlib import asynccontextmanager
+
+app = FastAPI(title="Cats vs Dogs Inference Service")
+
+# Global model variable
+model = None
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load model on startup
+    global model
+    model_path = "models/model.h5"
+    if os.path.exists(model_path):
+        model = tf.keras.models.load_model(model_path)
+        print(f"Model loaded from {model_path}")
+    else:
+        print("Model file not found! Predictions will fail.")
+    yield
+    # Clean up (if needed)
+
+app = FastAPI(lifespan=lifespan)
+
+@app.get("/health")
+def health_check():
+    if model:
+        return {"status": "healthy", "model_loaded": True}
+    return {"status": "unhealthy", "model_loaded": False}
+
+def preprocess_image(image_bytes: bytes):
+    """Preprocess image bytes to match training input (224x224, normalized)"""
+    img = Image.open(io.BytesIO(image_bytes))
+    img = img.resize((224, 224))
+    img_array = tf.keras.utils.img_to_array(img)
+    img_array = tf.expand_dims(img_array, 0)  # Create batch axis
+    # Rescaling (1./255) is already part of the model layers in train.py!
+    return img_array
+
+@app.post("/predict")
+async def predict(file: UploadFile = File(...)):
+    if not model:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    
+    try:
+        contents = await file.read()
+        processed_img = preprocess_image(contents)
+        
+        prediction = model.predict(processed_img)
+        score = float(prediction[0][0])
+        
+        # Binary classification: <0.5 Cat, >=0.5 Dog (assuming 0=Cat, 1=Dog based on alphabetical)
+        # tf.keras.utils.image_dataset_from_directory sorts alphabetically by default
+        label = "Dog" if score >= 0.5 else "Cat"
+        confidence = score if score >= 0.5 else 1 - score
+        
+        return {
+            "label": label,
+            "score": score,
+            "confidence": confidence
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

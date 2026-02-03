@@ -22,7 +22,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ src/
 COPY models/ models/
 COPY .dvc/ .dvc/
-COPY dvc.yaml dvc.yaml
 # We copy models directly for now. In a real CD, we might pull from DVC/S3.
 
 # Expose port

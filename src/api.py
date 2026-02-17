@@ -18,12 +18,23 @@ model = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Define a custom Dense layer that ignores 'quantization_config'
+    @tf.keras.utils.register_keras_serializable(package='Custom', name='Dense')
+    class PatchedDense(tf.keras.layers.Dense):
+        def __init__(self, quantization_config=None, **kwargs):
+            super().__init__(**kwargs)
+
     # Load model on startup
     global model
     model_path = "models/model.h5"
     if os.path.exists(model_path):
-        model = tf.keras.models.load_model(model_path)
-        print(f"Model loaded from {model_path}")
+        try:
+            model = tf.keras.models.load_model(model_path, custom_objects={'Dense': PatchedDense})
+            print(f"Model loaded from {model_path}")
+        except Exception as e:
+            print(f"Failed to load model: {e}")
+            # Fallback or re-raise if critical
+            raise e
     else:
         print("Model file not found! Predictions will fail.")
     yield

@@ -8,21 +8,39 @@ from src.data_loader import load_data
 # Define model parameters
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-EPOCHS = 2
-LEARNING_RATE = 0.001
+EPOCHS = 10
+LEARNING_RATE = 0.0001
 
 def build_model():
-    model = models.Sequential([
-        layers.Input(shape=(224, 224, 3)),
-        layers.Rescaling(1./255),
-        layers.Conv2D(32, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Conv2D(64, (3, 3), activation='relu'),
-        layers.MaxPooling2D((2, 2)),
-        layers.Flatten(),
-        layers.Dense(64, activation='relu'),
-        layers.Dense(1, activation='sigmoid')
-    ])
+    # Load the pre-trained MobileNetV2 model
+    base_model = tf.keras.applications.MobileNetV2(
+        input_shape=(224, 224, 3),
+        include_top=False,
+        weights='imagenet'
+    )
+    
+    # Freeze the base model
+    base_model.trainable = False
+    
+    # Create the new model
+    inputs = tf.keras.Input(shape=(224, 224, 3))
+    
+    # Data Augmentation
+    x = layers.RandomFlip("horizontal")(inputs)
+    x = layers.RandomRotation(0.1)(x)
+    
+    # Preprocessing for MobileNetV2 ([-1, 1])
+    x = layers.Rescaling(1./127.5, offset=-1)(x)
+    
+    # Pass through base model
+    x = base_model(x, training=False)
+    
+    # Classification Head
+    x = layers.GlobalAveragePooling2D()(x)
+    x = layers.Dropout(0.2)(x)
+    outputs = layers.Dense(1, activation='sigmoid')(x)
+    
+    model = tf.keras.Model(inputs, outputs)
     
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
                   loss='binary_crossentropy',

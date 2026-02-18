@@ -71,7 +71,7 @@ def health_check():
 
 def preprocess_image(image_bytes: bytes):
     """Preprocess image bytes to match training input (224x224, normalized)"""
-    img = Image.open(io.BytesIO(image_bytes))
+    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
     img = img.resize((224, 224))
     img_array = tf.keras.utils.img_to_array(img)
     img_array = tf.expand_dims(img_array, 0)  # Create batch axis

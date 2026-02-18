@@ -4,8 +4,13 @@ This project implements an end-to-end MLOps pipeline for binary image classifica
 
 ## 👨‍💻 Developer Information
 
-*   **Name:** Maheshwari Aditya Lalchand
-*   **ID/Email:** 2024AA05822@WILP.BITS-PILANI.AC.IN
+* Group Project for BITS Pilani - MLOps Course (S1-25_AIMLCZG523)
+
+* Maheshwari Aditya Lalchand - 2024AA05822@WILP.BITS-PILANI.AC.IN
+* P Kiran Kumar - 2024AB05247@WILP.BITS-PILANI.AC.IN
+* Sabarinathan M - 2024AB05248@WILP.BITS-PILANI.AC.IN
+* Kannan P Nair - 2024AB05250@WILP.BITS-PILANI.AC.IN
+* Vishal Arora - 2024AA05008@WILP.BITS-PILANI.AC.IN
 
 ---
 

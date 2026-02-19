@@ -1,0 +1,15 @@
+Project URLs
+
+Frontend Interface:
+http://localhost:5500
+
+Backend API (FastAPI):
+- Documentation (Swagger UI): http://localhost:8000/docs
+- Root Endpoint: http://localhost:8000/
+- Health Check: http://localhost:8000/health
+- Prometheus Metrics: http://localhost:8000/metrics
+
+MLflow UI (Experiment Tracking):
+http://localhost:5001
+
+Note: Ensure Docker containers are running for Backend and MLflow services.

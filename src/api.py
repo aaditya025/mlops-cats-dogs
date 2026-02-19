@@ -13,6 +13,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+from prometheus_fastapi_instrumentator import Instrumentator
+
 # Global model variable
 model = None
 
@@ -63,6 +65,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 # Add Logging Middleware
 app.add_middleware(LoggingMiddleware)
 
+# Initialize Prometheus Instrumentator
+instrumentator = Instrumentator().instrument(app).expose(app)
+
 @app.get("/health")
 def health_check():
     if model:
@@ -102,6 +107,11 @@ async def predict(file: UploadFile = File(...)):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/feedback")
+async def feedback(image_id: str, actual_label: str, predicted_label: str):
+    logger.info(f"FEEDBACK: image_id={image_id}, actual={actual_label}, predicted={predicted_label}")
+    return {"status": "received"}
 
 if __name__ == "__main__":
     import uvicorn
